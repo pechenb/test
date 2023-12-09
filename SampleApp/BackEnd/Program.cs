@@ -1,42 +1,39 @@
-var builder = WebApplication.CreateBuilder(args);
+using System;
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+namespace CombinationsOfAB
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Введём с клавиатуры длину комбинации
+            Console.WriteLine("Введите длину комбинации: ");
+            int n = int.Parse(Console.ReadLine());
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+            // Выведем на экран все комбинации
+            foreach (string combination in GenerateCombinations(n))
+            {
+                Console.WriteLine(combination);
+            }
+        }
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+        private static IEnumerable<string> GenerateCombinations(int n)
+        {
+            // Если длина комбинации равна 0, то возвращаем пустую строку
+            if (n == 0)
+            {
+                yield return "";
+            }
 
-app.Run();
+            // Итерируемся по всем комбинациям длиной n - 1
+            foreach (string combination in GenerateCombinations(n - 1))
+            {
+                // Добавляем в конец комбинации символ a
+                yield return combination + "a";
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+                // Добавляем в конец комбинации символ b
+                yield return combination + "b";
+            }
+        }
+    }
 }
